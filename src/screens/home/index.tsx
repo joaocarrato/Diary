@@ -25,7 +25,7 @@ const Home = () => {
   const [input, setInput] = useState('');
   const [personalDiary, setPersonalDiary] = useState<Array<IDiaryCard>>([]);
 
-  const { addCard, diaries, removeAll } = useDiaryStore();
+  const { addCard, diaries, removeAll, removeCard } = useDiaryStore();
 
   const navigation = useNavigation<StackTypes>();
 
@@ -121,6 +121,14 @@ const Home = () => {
               numberOfLines={3}>
               {item.text}
             </Text>
+
+            <TouchableOpacity onPress={() => removeCard(item.id)}>
+              <Ionicons
+                name="trash-outline"
+                color={colors.text.error}
+                size={30}
+              />
+            </TouchableOpacity>
           </TouchableOpacity>
         )}
       />

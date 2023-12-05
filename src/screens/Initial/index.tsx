@@ -48,7 +48,7 @@ const Initial = () => {
           Unleash Your Thoughts, Capture Your Moments. Your Personal Diary,
           Always by Your Side.
         </Text>
-
+        
         <Controller
           control={control}
           name="user"

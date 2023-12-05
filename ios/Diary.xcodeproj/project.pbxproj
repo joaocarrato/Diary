@@ -584,6 +584,7 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-fprofile-instr-generate",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.diary.personalcarrato;
 				PRODUCT_NAME = Diary;
@@ -612,6 +613,7 @@
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
+					"-fprofile-instr-generate",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.diary.personalcarrato;
 				PRODUCT_NAME = Diary;

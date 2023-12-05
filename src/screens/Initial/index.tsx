@@ -10,7 +10,6 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Toast from 'react-native-toast-message';
 import { z } from 'zod';
 import { colors } from '../../shared/themes/themes';
 import { Background } from '../../shared/utils/images';
@@ -36,17 +35,7 @@ const Initial = () => {
   });
 
   const handleAdd = (data: userSchemaData) => {
-    addName(data.user),
-      Toast.show({
-        type: 'success',
-        text1: 'User logged in successfully',
-        topOffset: 80,
-        visibilityTime: 2000,
-      });
-  };
-
-  const createUser = (data: userSchemaData) => {
-    console.log(data.user);
+    addName(data.user);
   };
 
   return (

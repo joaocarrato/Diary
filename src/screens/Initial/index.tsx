@@ -1,4 +1,6 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   Image,
   StyleSheet,
@@ -8,35 +10,32 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import Toast from 'react-native-toast-message';
+import { z } from 'zod';
 import { colors } from '../../shared/themes/themes';
 import { Background } from '../../shared/utils/images';
 import { useUserStore } from '../../store/useUserStore';
+
+const schema = z.object({
+  user: z.string().min(3, 'User must have at least 3 characters').trim(),
+});
+
+type userSchemaData = z.infer<typeof schema>;
 
 const Initial = () => {
   const [user, setUser] = useState('');
 
   const { name, addName, removeName } = useUserStore();
 
-  const handleAdd = (name: string) => {
-    if (user.length !== 0) {
-      return (
-        addName(name),
-        Toast.show({
-          type: 'success',
-          text1: 'User logged in successfully',
-          topOffset: 80,
-          visibilityTime: 2000,
-        })
-      );
-    } else {
-      return Toast.show({
-        type: 'error',
-        text1: 'Invalid User',
-        topOffset: 80,
-        visibilityTime: 2000,
-      });
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<userSchemaData>({
+    resolver: zodResolver(schema),
+  });
+
+  const handleAdd = (data: userSchemaData) => {
+    addName(data.user);
   };
 
   return (
@@ -50,15 +49,24 @@ const Initial = () => {
           Always by Your Side.
         </Text>
 
-        <TextInput
-          value={user}
-          onChangeText={setUser}
-          placeholder="Enter with your name..."
-          placeholderTextColor={colors.text.primary}
-          style={styles.input}
+        <Controller
+          control={control}
+          name="user"
+          render={({ field: { value, onChange } }) => (
+            <TextInput
+              value={value}
+              onChangeText={onChange}
+              placeholder="Enter with your name..."
+              placeholderTextColor={colors.text.primary}
+              style={styles.input}
+            />
+          )}
         />
+        {errors && <Text style={styles.error}>{errors.user?.message}</Text>}
 
-        <TouchableOpacity style={styles.button} onPress={() => handleAdd(user)}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit(handleAdd)}>
           <Text style={styles.textButton}>Enter</Text>
         </TouchableOpacity>
       </View>
@@ -111,7 +119,6 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 16,
-    fontWeight: 'bold',
     color: colors.text.error,
   },
 });

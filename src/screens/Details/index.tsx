@@ -45,6 +45,7 @@ const Details = () => {
       type: 'success',
       topOffset: 60,
       text1: 'Note deleted successfully',
+      visibilityTime: 2000,
     });
   };
 

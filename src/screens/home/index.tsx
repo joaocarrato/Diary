@@ -34,6 +34,7 @@ const Home = () => {
       type: 'success',
       text1: 'User successfully logged out',
       topOffset: 60,
+      visibilityTime: 2000,
     });
     removeName();
   };

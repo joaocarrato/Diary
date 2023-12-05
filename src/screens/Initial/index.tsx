@@ -25,6 +25,7 @@ const Initial = () => {
           type: 'success',
           text1: 'User logged in successfully',
           topOffset: 80,
+          visibilityTime: 2000,
         })
       );
     } else {
@@ -32,6 +33,7 @@ const Initial = () => {
         type: 'error',
         text1: 'Invalid User',
         topOffset: 80,
+        visibilityTime: 2000,
       });
     }
   };

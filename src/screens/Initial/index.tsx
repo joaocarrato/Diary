@@ -23,14 +23,14 @@ const Initial = () => {
         addName(name),
         Toast.show({
           type: 'success',
-          text1: 'Usuario cadastrado com sucesso',
+          text1: 'User logged in successfully',
           topOffset: 80,
         })
       );
     } else {
       return Toast.show({
         type: 'error',
-        text1: 'Usuario invalido',
+        text1: 'Invalid User',
         topOffset: 80,
       });
     }
@@ -40,7 +40,8 @@ const Initial = () => {
     <View style={styles.container}>
       <Image source={Background} style={styles.image} />
       <Text style={styles.title}>
-        When you dream about something, keep it and never forget about.
+        Unleash Your Thoughts, Capture Your Moments. Your Personal Diary, Always
+        by Your Side.
       </Text>
 
       <TextInput

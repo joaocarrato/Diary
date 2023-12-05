@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
   FlatList,
@@ -9,8 +10,11 @@ import {
   View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uid } from 'uid';
 import { IDiaryCard } from '../../@types/interface';
+
+import { StackTypes } from '../../@types/navigationTypes';
 import { colors } from '../../shared/themes/themes';
 import { Background } from '../../shared/utils/images';
 import { useDiaryStore } from '../../store/useDiaryStore';
@@ -23,10 +27,12 @@ const Home = () => {
 
   const { addCard, diaries, removeAll } = useDiaryStore();
 
+  const navigation = useNavigation<StackTypes>();
+
   const handleRemove = (): void => {
     Toast.show({
       type: 'success',
-      text1: 'Usuario deslogado com sucesso',
+      text1: 'User successfully logged out',
       topOffset: 60,
     });
     removeName();
@@ -37,22 +43,34 @@ const Home = () => {
       // setPersonalDiary([...personalDiary, { id: uid(10), text: text }]);
       const uuid = uid(10);
       addCard(uuid, text);
+      setInput('');
     } else {
       Toast.show({
         type: 'error',
-        text1: 'Campo não pode ser vázio.',
+        text1: 'Field cannot be empty',
         topOffset: 60,
       });
     }
   };
 
-  console.log(diaries);
+  const handleRemoveAll = () => {
+    removeAll();
+    Toast.show({
+      type: 'success',
+      text1: 'Cleared all',
+      topOffset: 60,
+    });
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => handleRemove()}>
-          <Text>Sair</Text>
+          <Ionicons
+            name="log-out-outline"
+            size={35}
+            color={colors.support.primary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My personal Diary</Text>
 
@@ -72,12 +90,16 @@ const Home = () => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => addThoughts(input)}>
-          <Text style={styles.buttonText}>Add</Text>
+          <Ionicons
+            name="add-outline"
+            size={30}
+            color={colors.support.primary}
+          />
         </TouchableOpacity>
       </View>
 
       {diaries.length > 0 && (
-        <TouchableOpacity onPress={removeAll}>
+        <TouchableOpacity onPress={handleRemoveAll}>
           <Text style={styles.clear}>Clear all</Text>
         </TouchableOpacity>
       )}
@@ -86,7 +108,11 @@ const Home = () => {
         data={diaries}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.navigate('Detail', { id: item.id, text: item.text })
+            }>
             <Image source={Background} style={styles.image} />
             <Text
               style={styles.cardText}
@@ -153,11 +179,6 @@ const styles = StyleSheet.create({
     height: 55,
     width: 55,
     backgroundColor: colors.support.secundary,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: colors.support.primary,
-    fontWeight: 'bold',
   },
   card: {
     height: 95,

@@ -1,5 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
   FlatList,
   Image,
@@ -12,22 +14,43 @@ import {
 import Toast from 'react-native-toast-message';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { uid } from 'uid';
-import { IDiaryCard } from '../../@types/interface';
-
+import { z } from 'zod';
 import { StackTypes } from '../../@types/navigationTypes';
 import { colors } from '../../shared/themes/themes';
 import { Background } from '../../shared/utils/images';
 import { useDiaryStore } from '../../store/useDiaryStore';
 import { useUserStore } from '../../store/useUserStore';
 
+const schema = z
+  .object({
+    thoughts: z
+      .string()
+      .trim()
+      .refine(data => data.trim().length > 3, {
+        message: 'Thoughts must have at least 3 non-whitespace character',
+      }),
+  })
+  .required();
+
+type thoughtsSchemaData = z.infer<typeof schema>;
+
 const Home = () => {
+  const [currentDate, setCurrentDate] = useState('');
+
   const { removeName, name } = useUserStore();
-  const [input, setInput] = useState('');
-  const [personalDiary, setPersonalDiary] = useState<Array<IDiaryCard>>([]);
 
   const { addCard, diaries, removeAll, removeCard } = useDiaryStore();
 
   const navigation = useNavigation<StackTypes>();
+
+  const {
+    control,
+    handleSubmit,
+    resetField,
+    formState: { errors },
+  } = useForm<thoughtsSchemaData>({
+    resolver: zodResolver(schema),
+  });
 
   const handleRemove = (): void => {
     Toast.show({
@@ -39,19 +62,10 @@ const Home = () => {
     removeName();
   };
 
-  const addThoughts = (text: string) => {
-    if (input.length !== 0) {
-      // setPersonalDiary([...personalDiary, { id: uid(10), text: text }]);
-      const uuid = uid(10);
-      addCard(uuid, text);
-      setInput('');
-    } else {
-      Toast.show({
-        type: 'error',
-        text1: 'Field cannot be empty',
-        topOffset: 60,
-      });
-    }
+  const onSubmit = (data: thoughtsSchemaData) => {
+    const uuid = uid(10);
+    addCard(uuid, data.thoughts);
+    resetField('thoughts');
   };
 
   const handleRemoveAll = () => {
@@ -62,6 +76,14 @@ const Home = () => {
       topOffset: 60,
     });
   };
+
+  useEffect(() => {
+    const day = new Date().getDate();
+    const month = new Date().getMonth();
+    const year = new Date().getFullYear();
+
+    return setCurrentDate(`${day}-${month}-${year}`);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -81,16 +103,22 @@ const Home = () => {
       <Text style={styles.title}>Hello {name}</Text>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          style={styles.input}
-          placeholder="Any thoughts today?..."
-          placeholderTextColor={colors.text.primary}
+        <Controller
+          control={control}
+          name="thoughts"
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              value={value}
+              onChangeText={onChange}
+              style={styles.input}
+              placeholder="Any thoughts today?..."
+              placeholderTextColor={colors.text.primary}
+            />
+          )}
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={() => addThoughts(input)}>
+          onPress={handleSubmit(onSubmit)}>
           <Ionicons
             name="add-outline"
             size={30}
@@ -109,27 +137,30 @@ const Home = () => {
         data={diaries}
         keyExtractor={item => String(item.id)}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() =>
-              navigation.navigate('Detail', { id: item.id, text: item.text })
-            }>
-            <Image source={Background} style={styles.image} />
-            <Text
-              style={styles.cardText}
-              lineBreakMode="clip"
-              numberOfLines={3}>
-              {item.text}
-            </Text>
+          <View>
+            <Text style={styles.date}>{currentDate}</Text>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate('Detail', { id: item.id, text: item.text })
+              }>
+              <Image source={Background} style={styles.image} />
+              <Text
+                style={styles.cardText}
+                lineBreakMode="clip"
+                numberOfLines={3}>
+                {item.text}
+              </Text>
 
-            <TouchableOpacity onPress={() => removeCard(item.id)}>
-              <Ionicons
-                name="trash-outline"
-                color={colors.text.error}
-                size={30}
-              />
+              <TouchableOpacity onPress={() => removeCard(item.id)}>
+                <Ionicons
+                  name="trash-outline"
+                  color={colors.text.error}
+                  size={30}
+                />
+              </TouchableOpacity>
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
         )}
       />
     </View>
@@ -211,6 +242,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.text.primary,
     fontWeight: 'bold',
+  },
+  error: {
+    fontSize: 16,
+    color: colors.text.error,
+  },
+  date: {
+    color: colors.text.primary,
   },
 });
 

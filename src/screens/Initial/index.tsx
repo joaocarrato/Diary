@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Toast from 'react-native-toast-message';
 import { colors } from '../../shared/themes/themes';
 import { Background } from '../../shared/utils/images';
@@ -39,29 +40,38 @@ const Initial = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={Background} style={styles.image} />
-      <Text style={styles.title}>
-        Unleash Your Thoughts, Capture Your Moments. Your Personal Diary, Always
-        by Your Side.
-      </Text>
+    <KeyboardAwareScrollView
+      style={styles.keyboardContainer}
+      scrollEnabled={false}>
+      <View style={styles.container}>
+        <Image source={Background} style={styles.image} />
+        <Text style={styles.title}>
+          Unleash Your Thoughts, Capture Your Moments. Your Personal Diary,
+          Always by Your Side.
+        </Text>
 
-      <TextInput
-        value={user}
-        onChangeText={setUser}
-        placeholder="Enter with your name..."
-        placeholderTextColor={colors.text.primary}
-        style={styles.input}
-      />
+        <TextInput
+          value={user}
+          onChangeText={setUser}
+          placeholder="Enter with your name..."
+          placeholderTextColor={colors.text.primary}
+          style={styles.input}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={() => handleAdd(user)}>
-        <Text style={styles.textButton}>Enter</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.button} onPress={() => handleAdd(user)}>
+          <Text style={styles.textButton}>Enter</Text>
+        </TouchableOpacity>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+    paddingTop: '25%',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
